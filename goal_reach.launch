@@ -1,0 +1,52 @@
+ <launch> 
+  <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+  <arg name="x_pos" default="-3.0"/>
+  <arg name="y_pos" default="1.0"/>
+  <arg name="z_pos" default="0.0"/>
+  <arg name="goal_position"  default="true"/>
+  
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/my_world.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+  
+  <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
+  
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model turtlebot3 -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -param robot_description" />
+  
+  <group if="$(eval goal_position == 'goal_A')">
+  
+ 	 <include file="$(find turtlebot3_navigation)/launch/turtlebot3_navigation_map4.launch">
+ 	 </include>
+ 	 
+  </group>
+  
+  <group if="$(eval goal_position == 'goal_B')">
+  
+ 	 <include file="$(find turtlebot3_navigation)/launch/turtlebot3_navigation_map4.launch">
+ 	 </include>
+ 	 
+  </group>
+  
+  <group if="$(eval goal_position == 'goal_C')">
+  
+ 	 <include file="$(find turtlebot3_navigation)/launch/turtlebot3_navigation_map2.launch">
+ 	 </include>
+ 	 
+  </group>
+  
+  <group if="$(eval goal_position == 'goal_D')">
+  
+ 	 <include file="$(find turtlebot3_navigation)/launch/turtlebot3_navigation_map2.launch">
+ 	 </include>
+ 	 
+  </group>
+ 
+  <node pkg="kat_task" name="map_nav" type="navigation.py" args="$(arg goal_position)"/>
+  
+ </launch>
+  
